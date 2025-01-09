@@ -25,6 +25,10 @@ const productSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    product_image:{
+        type: String,
+        trim: true
+    },
     category:{
         type: String,
         required: true,
