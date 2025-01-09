@@ -15,7 +15,7 @@ const billSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    user_id:{
+    customer_id:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
