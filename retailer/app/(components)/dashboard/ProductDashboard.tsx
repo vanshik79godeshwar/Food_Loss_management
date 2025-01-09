@@ -1,4 +1,4 @@
-'use client';  // Add this at the top since we're using client-side features
+'use client'; 
 
 import React from 'react';
 import {
@@ -16,7 +16,6 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-// Types
 interface Product {
     name: string;
     price: number;
@@ -66,7 +65,6 @@ const generateDummyData = (): Product[] => {
 const ProductDashboard: React.FC = () => {
   const dummyData = generateDummyData();
   
-  // Prepare data for price distribution chart
   const priceDistribution = dummyData.reduce<Record<string, number>>((acc, item) => {
     const priceRange = `$${Math.floor(item.price/10) * 10}-${Math.floor(item.price/10) * 10 + 10}`;
     acc[priceRange] = (acc[priceRange] || 0) + 1;
@@ -78,7 +76,6 @@ const ProductDashboard: React.FC = () => {
     count
   }));
 
-  // Prepare data for retailer distribution
   const retailerData = dummyData.reduce<Record<string, number>>((acc, item) => {
     acc[item.retailer] = (acc[item.retailer] || 0) + 1;
     return acc;
@@ -89,7 +86,6 @@ const ProductDashboard: React.FC = () => {
     value
   }));
 
-  // Prepare data for discount vs price scatter
   const discountData: DiscountData[] = dummyData.map(item => ({
     price: item.price,
     discount: item.discount
@@ -116,7 +112,6 @@ const ProductDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Retailer Distribution Pie Chart */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Products by Retailer</h2>
           <div className="h-64">
@@ -138,8 +133,6 @@ const ProductDashboard: React.FC = () => {
             </ResponsiveContainer>
           </div>
         </div>
-
-        {/* Price vs Discount Scatter */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Price vs Discount Correlation</h2>
           <div className="h-64">
@@ -155,7 +148,6 @@ const ProductDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Days Until Expiry Chart */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Days Until Expiry</h2>
           <div className="h-64">
