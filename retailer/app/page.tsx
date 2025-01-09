@@ -4,6 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Sidebar from "./components/Sidebar";
 
 export default function HomePage() {
   const { isSignedIn, isLoaded } = useAuth();
