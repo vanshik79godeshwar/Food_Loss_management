@@ -10,7 +10,9 @@ app.use(express.json());
 
 
 // Routes
+const ProductRoutes=require('./routes/productCustomerRoutes.js');
 app.use('/user',userRoutes);
+app.use('/product',ProductRoutes);
 
 // Error handling.
 app.use((err,req,res,next)=>{
