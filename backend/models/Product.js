@@ -26,7 +26,7 @@ const productSchema = new mongoose.Schema({
         required: true
     },
     product_image:{
-        type: String,
+        type: Array,
         trim: true
     },
     category:{
@@ -37,6 +37,11 @@ const productSchema = new mongoose.Schema({
     quantity:{
         type:Number,
         required:true
+    },
+    description:{
+        type:String,
+        required:true,
+        trim:true
     }
 },{timestamps: true});
 

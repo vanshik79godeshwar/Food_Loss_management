@@ -1,5 +1,5 @@
 const express=require('express')
-const router=express.Router()
+const router=express.Router({useParams:true})
 const wrapAsync=require('../Utils/wrapAsync.js')
 const {fetchProduct,createProducts}=require("../controllers/productRetailerController.js")
  
