@@ -1,10 +1,7 @@
-const { response } = require('express');
 const Bill = require('../models/Bill');
 const BillItem = require('../models/BillItem');
-const User = require('../models/User');
 const Razorpay = require('razorpay');
 const { validatePaymentVerification } = require('razorpay/dist/utils/razorpay-utils');
-const { parse } = require('dotenv');
 require('dotenv').config();
 
 const initate = async (amount) => {

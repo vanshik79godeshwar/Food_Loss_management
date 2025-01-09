@@ -35,7 +35,7 @@ const productSchema = new mongoose.Schema({
         trim: true
     },
     quantity:{
-        type:Integer,
+        type:Number,
         required:true
     }
 },{timestamps: true});
