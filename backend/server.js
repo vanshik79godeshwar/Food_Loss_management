@@ -5,8 +5,12 @@ const productRetailerRoutes=require("./routes/productRetailerRoutes.js");
 const billRoutes=require('./routes/billRoutes.js')
 require('dotenv').config()
 const app=express();
-const port=3000;
+const port=5000;
 const connect_db=require('./connect_db.js')
+const cors = require('cors')
+
+
+app.use(cors());
 
 // Middlewares.
 app.use(express.urlencoded({extended:true}))
@@ -29,5 +33,6 @@ connect_db();
 
 app.listen(port,()=>{
     console.log('App is listening on port successfully :)');
+    console.log(`http://localhost:${port}`);
 })
 

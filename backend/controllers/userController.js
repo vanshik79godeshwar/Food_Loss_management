@@ -13,7 +13,8 @@ const login = async (req, res, next) => {
 
 const signUp = async (req, res, next) => {
   const { email, username, profile,type } = req.body;
-
+  console.log("flag flag 123");
+  console.log(email, username, profile);
   if (!email || !username) {
     throw new Error("User Not found!");
   }
