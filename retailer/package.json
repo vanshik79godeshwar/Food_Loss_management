@@ -9,11 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-<<<<<<< Updated upstream
     "@clerk/nextjs": "^6.9.8",
-=======
-    "@clerk/nextjs": "^6.9.7",
->>>>>>> Stashed changes
     "@shadcn/ui": "^0.0.4",
     "@types/recharts": "^1.8.29",
     "autoprefixer": "^10.4.20",
