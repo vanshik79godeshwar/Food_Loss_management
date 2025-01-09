@@ -1,18 +1,22 @@
 const express=require('express')
 const userRoutes=require('./routes/userRoutes.js')
+const productCustomerRoutes=require('./routes/productCustomerRoutes.js')
+const productRetailerRoutes=require("./routes/productRetailerRoutes.js");
 require('dotenv').config()
 const app=express();
 const port=3000;
 const connect_db=require('./connect_db.js')
+
 // Middlewares.
 app.use(express.urlencoded({extended:true}))
 app.use(express.json());
 
 
 // Routes
-const ProductRoutes=require('./routes/productCustomerRoutes.js');
+app.use('/products',productCustomerRoutes);
+app.use('/:id/products',productRetailerRoutes);
 app.use('/user',userRoutes);
-app.use('/product',ProductRoutes);
+
 
 // Error handling.
 app.use((err,req,res,next)=>{
