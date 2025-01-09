@@ -15,16 +15,8 @@ const createProducts = async (req, res, next) => {
   const userId = req.params.userId;
   if (!userId) throw new Error("User Not found!");
 
-  const {
-    name,
-    price,
-    expiry_date,
-    discount,
-    retailer_id,
-    category,
-    product_image,
-    description,
-  } = req.body;
+  const { name, price, expiry_date, discount, retailer_id, category,product_image,description } =
+    req.body;
 
   if (
     !name ||
@@ -38,16 +30,16 @@ const createProducts = async (req, res, next) => {
   )
     throw new Error("Data not found!");
 
-    const product = new Products({
-      name,
-      price,
-      expiry_date,
-      discount,
-      retailer_id,
-      category,
-      product_image,
-      description
-    });
+  const product = new Products({
+    name,
+    price,
+    expiry_date,
+    discount,
+    retailer_id,
+    category,
+    product_image,
+    description
+  });
   await product.save();
   return res.status(200).json(product);
 };

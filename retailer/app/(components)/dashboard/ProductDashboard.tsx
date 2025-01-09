@@ -1,6 +1,7 @@
-'use client'; 
+"use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import {
   LineChart,
   Line,
@@ -15,81 +16,58 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import {getPriceDistribution,retailerDistribution,discountData,daysUntilExpiry} from "@/server_actions/Retailer"
 
-interface Product {
-    name: string;
-    price: number;
-    expiry_date: Date;
-    discount: number;
-    retailer: string;
-    createdAt: Date;
+export interface PriceDistribution {
+  range: string;
+  count: number;
 }
-
-interface PriceDistributionData {
-    range: string;
-    count: number;
+export interface RetailerPieData {
+  name: string;
+  value: number;
 }
-
-interface RetailerPieData {
-    name: string;
-    value: number;
+export interface DiscountData {
+  price: number;
+  discount: number;
 }
-
-interface DiscountData {
-    price: number;
-    discount: number;
+export interface ExpiryData {
+  name: string;
+  daysUntilExpiry: number;
 }
-
-// Generate dummy data
-const generateDummyData = (): Product[] => {
-  const retailers: string[] = ['Store A', 'Store B', 'Store C', 'Store D'];
-  const products: string[] = ['Apple', 'Banana', 'Orange', 'Milk', 'Bread', 'Cheese', 'Eggs'];
-  const data: Product[] = [];
-  
-  for (let i = 0; i < 20; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() + Math.floor(Math.random() * 30));
-    
-    data.push({
-      name: products[Math.floor(Math.random() * products.length)],
-      price: Math.floor(Math.random() * 50) + 10,
-      expiry_date: date,
-      discount: Math.floor(Math.random() * 30),
-      retailer: retailers[Math.floor(Math.random() * retailers.length)],
-      createdAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000)
-    });
-  }
-  return data;
-};
 
 const ProductDashboard: React.FC = () => {
-  const dummyData = generateDummyData();
-  
-  const priceDistribution = dummyData.reduce<Record<string, number>>((acc, item) => {
-    const priceRange = `$${Math.floor(item.price/10) * 10}-${Math.floor(item.price/10) * 10 + 10}`;
-    acc[priceRange] = (acc[priceRange] || 0) + 1;
-    return acc;
-  }, {});
-  
-  const priceDistributionData: PriceDistributionData[] = Object.entries(priceDistribution).map(([range, count]) => ({
-    range,
-    count
-  }));
+  const [priceDistributionData, setPriceDistributionData] = useState<PriceDistribution[]>([]);
+  const [retailerPieData, setRetailerPieData] = useState<RetailerPieData[]>([]);
+  const [discountsData, setDiscountsData] = useState<DiscountData[]>([]);
+  const [expiryData, setExpiryData] = useState<ExpiryData[]>([]);
 
-  const retailerData = dummyData.reduce<Record<string, number>>((acc, item) => {
-    acc[item.retailer] = (acc[item.retailer] || 0) + 1;
-    return acc;
-  }, {});
-  
-  const retailerPieData: RetailerPieData[] = Object.entries(retailerData).map(([name, value]) => ({
-    name,
-    value
-  }));
+  useEffect(() => {
+    // Fetch price distribution data
+    let data1 = getPriceDistribution();
+    data1.then((data)=>{
+      setPriceDistributionData(data);
+    });
 
-  const discountData: DiscountData[] = dummyData.map(item => ({
-    price: item.price,
-    discount: item.discount
-  }));
+    // Fetch retailer distribution data
+    let data2 = retailerDistribution();
+    data2.then((data)=>{
+      setRetailerPieData(data);
+    });
+
+    // Fetch discount data
+    let data3 = discountData();
+    data3.then((data)=>{
+      setDiscountsData(data);
+    });
+
+    // Fetch expiry data
+    let data4 = daysUntilExpiry();
+    data4.then((data)=>{
+      setExpiryData(data);
+    });
+    
+    
+  }, []);
 
   return (
     <div className="p-6 space-y-8">
@@ -137,7 +115,7 @@ const ProductDashboard: React.FC = () => {
           <h2 className="text-xl font-semibold mb-4">Price vs Discount Correlation</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={discountData}>
+              <LineChart data={discountsData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="price" label={{ value: 'Price ($)', position: 'bottom' }} />
                 <YAxis label={{ value: 'Discount (%)', angle: -90, position: 'left' }} />
@@ -152,12 +130,7 @@ const ProductDashboard: React.FC = () => {
           <h2 className="text-xl font-semibold mb-4">Days Until Expiry</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={dummyData.map(item => ({
-                  name: item.name,
-                  daysUntilExpiry: Math.ceil((new Date(item.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
-                }))}
-              >
+              <BarChart data={expiryData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />

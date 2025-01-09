@@ -75,4 +75,5 @@ module.exports = {
     getRetailerDistribution,
     getDiscountData,
     getDaysUntilExpiry,
+
 };
