@@ -18,10 +18,10 @@ const createProducts = async (req, res, next) => {
   const { name, price, expiry_date, discount, retailer_id, category } =
     req.body;
 
-  if (!name || !price || !expiry_date || !discount || !retailer_id || !category)
+  if (!name || !price || !expiry_date || !discount || !retailer_id || !category || !product_image)
     throw new Error("Data not found!");
 
-  const product=new Products(req.body);
+  const product = new Products(req.body);
   return res.status(200).json(product);
 };
 

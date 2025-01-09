@@ -33,6 +33,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    quantity:{
+        type:Integer,
+        required:true
     }
 },{timestamps: true});
 
