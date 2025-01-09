@@ -1,14 +1,10 @@
-"use client"
-import React from 'react'
-import { SignOutButton } from '@clerk/nextjs'
+// app/dashboard/page.tsx
+import ProductDashboard from '../(components)/dashboard/ProductDashboard';
 
-const dashboard = () => {
+export default function DashboardPage() {
   return (
-    <div>
-      this is dashboard....
-        <SignOutButton />
-    </div>
-  )
+    <main className="min-h-screen bg-gray-50">
+      <ProductDashboard />
+    </main>
+  );
 }
-
-export default dashboard

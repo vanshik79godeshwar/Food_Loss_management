@@ -19,22 +19,9 @@ export default function HomePage() {
 
   return (
     <>
-      <h1>Welcome to my project</h1>
-      <SignedIn>
-        <p>You're signed in!</p>
-        <p>Your email address is {email || "No email found"}</p>
-        <button onClick={() => router.push("/dashboard")}>Go to dashboard</button>
-        <p>Your profile picture:</p>
-        {profileImageUrl ? (
-          <Image src={profileImageUrl} alt="profile picture" width={100} height={100} />
-        ) : (
-          <p>No profile picture available</p>
-        )}
-      </SignedIn>
-      <SignedOut>
-        <p>You're signed out!</p>
-        <SignInButton />
-      </SignedOut>
+      <div>
+        
+      </div>
     </>
   );
 }
