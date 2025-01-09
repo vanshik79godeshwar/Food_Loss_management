@@ -68,6 +68,10 @@ int main() {
     string filename = "dataset.txt";  
     vector<DemandData> data = readData(filename);
 
+    for(int i=0 ;i<200; i++){
+        cout << data[i].date << " " << data[i].category << endl;
+    }
+
     int windowSize = 7;  
     vector<int> predictedDemand = mva(data, windowSize);
 
