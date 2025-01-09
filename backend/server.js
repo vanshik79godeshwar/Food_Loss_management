@@ -11,7 +11,11 @@ app.use(express.json());
 
 // Routes
 
-
+//Models
+const Product = require('./models/product');
+const User = require('./models/User');
+const Bill = require('./models/Bill');
+const BillItem = require('./models/BillItem');
 
 // Error handling.
 app.use((err,req,res,next)=>{
