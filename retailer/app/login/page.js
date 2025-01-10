@@ -11,7 +11,7 @@ const page = () => {
     localStorage.setItem("user",JSON.stringify(session.user))
     router.push('/dashboard');
   }
-
+  
   useEffect(() => {
     document.title="Login - Foodie_Market"
   }, [])

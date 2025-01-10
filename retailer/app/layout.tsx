@@ -1,17 +1,19 @@
-import { ClerkProvider } from "@clerk/nextjs";
+import { SessionProvider } from "next-auth/react";
 import "./globals.css";
-
+import SessionWrapper from "@/app/(components)/Session_Wrapper"
 export const metadata = {
   title: "My App",
-  description: "A project using Clerk for authentication",
+  description: "A project using NextAuth for authentication",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body>{children}</body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body>
+        <SessionWrapper >
+          {children}
+        </SessionWrapper>
+      </body>
+    </html>
   );
 }
