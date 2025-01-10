@@ -1,4 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import { CartProvider } from "@/context/CartContext";
 import "./globals.css";
 
 export const metadata = {
@@ -8,10 +9,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
+    <CartProvider>
     <ClerkProvider>
       <html lang="en">
         <body>{children}</body>
       </html>
     </ClerkProvider>
+    </CartProvider>
   );
 }

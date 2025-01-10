@@ -48,19 +48,28 @@ vector<DemandData> readData(const string &filename) {
     return data;
 }
 
-vector<int> mva(vector<DemandData> &data, int windowSize) {
-    vector<int> movingAverages;
-    
-    for (size_t i = windowSize - 1; i < data.size(); ++i) {
-        int sum = 0;
-        for (int j = i - windowSize + 1; j <= i; ++j) {
-            if (data[j].category == data[i].category) {
-                sum++;
-            }
+vector<int> mva(vector<DemandData> &data, int windowSize, const vector<int> &categories) {
+    vector<int> movingAverages(categories.size(), 0);
+    unordered_map<int, vector<int>> categoryValues;
+
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (find(categories.begin(), categories.end(), data[i].category) != categories.end()) {
+            categoryValues[data[i].category].push_back(i);
         }
-        movingAverages.push_back(sum);
     }
-    
+
+    for (size_t i = 0; i < categories.size(); ++i) {
+        int category = categories[i];
+        const auto &indices = categoryValues[category];
+
+        if (indices.size() >= windowSize) {
+            for (size_t j = indices.size() - windowSize; j < indices.size(); ++j) {
+                movingAverages[i] += 1;
+            }
+            movingAverages[i] /= windowSize;
+        }
+    }
+
     return movingAverages;
 }
 
@@ -68,16 +77,14 @@ int main() {
     string filename = "dataset.txt";  
     vector<DemandData> data = readData(filename);
 
-    for(int i=0 ;i<200; i++){
-        cout << data[i].date << " " << data[i].category << endl;
-    }
-
+    vector<int> categories = {1, 2, 3, 4, 5};  // Selected categories
     int windowSize = 7;  
-    vector<int> predictedDemand = mva(data, windowSize);
 
-    cout << "Predicted Demand (Moving Average) for the given window size:" << endl;
-    for (size_t i = 0; i < predictedDemand.size(); ++i) {
-        cout << "For date " << data[i + windowSize - 1].date << ": " << predictedDemand[i] << " units" << endl;
+    vector<int> predictedPrices = mva(data, windowSize, categories);
+
+    cout << "Expected Price (Moving Average) for selected categories:" << endl;
+    for (size_t i = 0; i < categories.size(); ++i) {
+        cout << "Category " << categories[i] << ": " << predictedPrices[i] << endl;
     }
 
     return 0;

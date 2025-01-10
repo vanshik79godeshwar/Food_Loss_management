@@ -1,23 +1,26 @@
 "use client";
 import Image from "next/image";
-import { ShoppingCart, Search } from "lucide-react";
+import { ShoppingCart, Search, Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchProducts } from "@/serveractions/getproducts";
 import { productInterface } from "@/interfaces/productInterface";
-import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
-import axios from "axios";
 import Link from "next/link";
+import { ImageSlider } from "./(Components)/ImageSlider";
+import { useCart } from "@/context/CartContext";
 
 export default function Home() {
   const [products, setProducts] = useState<productInterface[]>([]);
-  const [cart, setCart] = useState<Record<string, { product: productInterface; count: number }>>({});
-  const { isSignedIn, user } = useUser();
+  const [filteredProducts, setFilteredProducts] = useState<productInterface[]>([]);
+  const [views, setViews] = useState<Record<string, number>>({});
+  const [search, setSearch] = useState("");
+  const { cart, increment, decrement } = useCart();
 
   useEffect(() => {
     const fetchProductData = async () => {
       try {
         const fetchedProducts = await fetchProducts();
         setProducts(fetchedProducts);
+        setFilteredProducts(fetchedProducts);
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }
@@ -26,51 +29,48 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const saveUserData = async () => {
-      if (isSignedIn && user) {
-        try {
-          await axios.post("http://localhost:5000/user/signup", {
-            email: user.emailAddresses[0]?.emailAddress,
-            username: user.firstName || "Guest",
-            profile: user.profileImageUrl || "",
-            type: "customer",
-          });
-          console.log("User data saved successfully.");
-        } catch (error) {
-          console.error("Failed to save user data:", error);
-        }
-      }
-    };
-    saveUserData();
-  }, [isSignedIn, user]);
+    const filtered = products.filter((product) =>
+      product.name.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  }, [search, products]);
 
-  const addToCart = (product: productInterface) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart[product._id];
-      return {
-        ...prevCart,
-        [product._id]: {
-          product,
-          count: existingItem ? existingItem.count + 1 : 1,
-        },
-      };
-    });
+  const incrementView = (productId: string) => {
+    setViews((prevViews) => ({
+      ...prevViews,
+      [productId]: (prevViews[productId] || 0) + 1,
+    }));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Foodie Market</h1>
-          <nav className="flex items-center space-x-4">
-            <a href="#" className="text-gray-600 hover:text-gray-800">
-              <Search className="w-6 h-6" />
-            </a>
-            <Link href="/about" className="text-gray-600 hover:text-gray-800">
+    <div className="min-h-screen bg-gray-100">
+      {/* Header Section */}
+      <header className="bg-white shadow-md p-4">
+        <div className="container mx-auto flex justify-between items-center space-x-4">
+          <Link href="/" className="text-2xl font-bold text-blue-600">
+            Product Store
+          </Link>
+          {/* Search Bar */}
+          <div className="flex items-center bg-gray-200 rounded-full px-4 py-2">
+            <Search className="w-5 h-5 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="bg-transparent outline-none ml-2 text-gray-700"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          {/* Navigation Links */}
+          <nav className="flex items-center space-x-6">
+            <Link href="/about" className="text-gray-700 hover:text-blue-600 font-medium">
               About
             </Link>
-            <Link href="/cart">
-              <a className="text-gray-600 hover:text-gray-800 relative">
+            <Link href="/profile" className="text-gray-700 hover:text-blue-600 font-medium">
+              Profile
+            </Link>
+            <Link href="/cart" legacyBehavior>
+              <a className="relative text-gray-700 hover:text-blue-600">
                 <ShoppingCart className="w-6 h-6" />
                 {Object.keys(cart).length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5">
@@ -79,74 +79,67 @@ export default function Home() {
                 )}
               </a>
             </Link>
-            {isSignedIn ? (
-              <div className="flex items-center space-x-2">
-                <UserButton />
-                <span className="text-gray-800 font-medium">
-                  {user?.firstName} {user?.lastName}
-                </span>
-              </div>
-            ) : (
-              <SignInButton mode="modal">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-                  Sign In
-                </button>
-              </SignInButton>
-            )}
           </nav>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <section className="mb-12 text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">Taste the Luxury</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Indulge in premium food products crafted for flavor and experience. Elevate your meals to the next level.
-          </p>
-        </section>
+      <ImageSlider />
 
+      {/* Main Section */}
+      <main className="container mx-auto py-8">
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.length === 0 ? (
-            <p className="text-center col-span-full text-gray-500">Loading products...</p>
-          ) : (
-            products.map((product) => (
-              <div
-                key={product._id}
-                className="bg-white rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex flex-col"
-              >
-                <div className="relative h-48 md:h-64">
-                  <img
-                    src={product.product_image || "/placeholder-image.png"}
-                    alt={product.name}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-                <div className="p-6 flex-grow">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">{product.name}</h3>
-                  <p className="text-gray-700 font-medium text-base mb-4">
-                    Price: <span className="text-red-600 font-bold">${product.price.toFixed(2)}</span>
-                  </p>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                    {product.description || "Delicious and premium-quality product."}
-                  </p>
-                  <button
-                    onClick={() => addToCart(product)}
-                    className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white py-2 px-4 rounded-md hover:opacity-90 transition duration-300"
-                  >
-                    Add to Cart
-                  </button>
+          {filteredProducts.map((product) => (
+            <div
+              key={product._id}
+              className="bg-white shadow-lg rounded-lg overflow-hidden transform transition-transform hover:scale-105"
+              onMouseEnter={() => incrementView(product._id)}
+            >
+              <div className="relative">
+                <Image
+                  src={product.product_image || "/placeholder-image.png"}
+                  alt={product.name}
+                  width={300}
+                  height={200}
+                  className="object-cover w-full"
+                />
+                <span className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                  {views[product._id] || 0} Views
+                </span>
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
+                <p className="text-gray-600 mt-1">${product.price.toFixed(2)}</p>
+                <div className="mt-4 flex items-center justify-between">
+                  {cart[product._id] ? (
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => decrement(product)}
+                        className="bg-gray-200 p-1 rounded-full hover:bg-gray-300"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="text-gray-700 font-medium">{cart[product._id].count}</span>
+                      <button
+                        onClick={() => increment(product)}
+                        className="bg-gray-200 p-1 rounded-full hover:bg-gray-300"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => increment(product)}
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 rounded hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
+                    >
+                      Add to Cart
+                    </button>
+                  )}
                 </div>
               </div>
-            ))
-          )}
+            </div>
+          ))}
         </section>
       </main>
-
-      <footer className="bg-gray-800 text-white py-8 mt-12">
-        <div className="container mx-auto px-4 text-center">
-          <p>&copy; 2025 Foodie Market. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 }
