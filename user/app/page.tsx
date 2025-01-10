@@ -1,44 +1,63 @@
-"use client"
-import Image from 'next/image';
-import { ShoppingCart, Search } from 'lucide-react';
-import { ImageSlider } from '@/app/(Components)/ImageSlider';
-import { useUser, SignInButton, UserButton } from '@clerk/nextjs'; // Import Clerk components
+"use client";
+import Image from "next/image";
+import { ShoppingCart, Search } from "lucide-react";
+import { ImageSlider } from "@/app/(Components)/ImageSlider";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation"; // Adjusted for next/navigation
+import { useEffect } from "react";
 
 const products = [
   {
     id: 1,
-    name: 'Fresh Veggie Salad',
-    price: '$12.99',
-    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+    name: "Fresh Veggie Salad",
+    price: "$12.99",
+    image:
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
   },
   {
     id: 2,
-    name: 'Gourmet Burger',
-    price: '$15.99',
-    image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    name: "Gourmet Burger",
+    price: "$15.99",
+    image:
+      "https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     id: 3,
-    name: 'Artisan Pizza',
-    price: '$18.99',
-    image: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+    name: "Artisan Pizza",
+    price: "$18.99",
+    image:
+      "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
   },
   {
     id: 4,
-    name: 'Tropical Smoothie',
-    price: '$8.99',
-    image: 'https://images.unsplash.com/photo-1423483641154-5411ec9c0ddf?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    name: "Tropical Smoothie",
+    price: "$8.99",
+    image:
+      "https://images.unsplash.com/photo-1423483641154-5411ec9c0ddf?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     id: 5,
-    name: 'Exotic Dessert Platter',
-    price: '$22.99',
-    image: 'https://images.unsplash.com/photo-1553452118-621e1f860f43?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    name: "Exotic Dessert Platter",
+    price: "$22.99",
+    image:
+      "https://images.unsplash.com/photo-1553452118-621e1f860f43?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
 ];
 
 export default function Home() {
-  const { isSignedIn, user } = useUser(); // Use Clerk's useUser hook
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    signOut();
+  };
+
+  useEffect(() => {
+    if (!session) {
+      console.log("No active session");
+    }
+  }, [session]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
@@ -55,19 +74,25 @@ export default function Home() {
                 2
               </span>
             </a>
-            {isSignedIn ? (
-              <div className="flex items-center space-x-2">
-                <UserButton /> {/* Clerk's UserButton component */}
-                <span className="text-gray-800 font-medium">
-                  {user?.firstName} {user?.lastName}
-                </span>
+            {session ? (
+              <div className="flex items-center space-x-4">
+                <div className="text-gray-800 font-medium">
+                  Welcome, {session.user?.name || "User"}!
+                </div>
+                <button
+                  onClick={() => handleLogout()}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                >
+                  Sign Out
+                </button>
               </div>
             ) : (
-              <SignInButton mode="modal">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-                  Sign In
-                </button>
-              </SignInButton>
+              <button
+                onClick={() => router.push('/login')}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+              >
+                Sign In
+              </button>
             )}
           </nav>
         </div>
@@ -79,14 +104,15 @@ export default function Home() {
         <section className="mb-12 text-center">
           <h2 className="text-4xl font-bold text-gray-800 mb-4">Taste the Luxury</h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Indulge in premium food products crafted for flavor and experience. Elevate your meals to the next level.
+            Indulge in premium food products crafted for flavor and experience.
+            Elevate your meals to the next level.
           </p>
         </section>
 
         <section
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
           style={{
-            gridAutoRows: 'minmax(250px, auto)',
+            gridAutoRows: "minmax(250px, auto)",
           }}
         >
           {products.map((product) => (
@@ -106,10 +132,12 @@ export default function Home() {
                   {product.name}
                 </h3>
                 <p className="text-gray-700 font-medium text-base mb-4">
-                  Price: <span className="text-red-600 font-bold">{product.price}</span>
+                  Price:{" "}
+                  <span className="text-red-600 font-bold">{product.price}</span>
                 </p>
                 <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                  Experience the delight of {product.name}. Perfect for connoisseurs of flavor and style.
+                  Experience the delight of {product.name}. Perfect for
+                  connoisseurs of flavor and style.
                 </p>
                 <button className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white py-2 px-4 rounded-md hover:opacity-90 transition duration-300">
                   Add to Cart
@@ -128,3 +156,4 @@ export default function Home() {
     </div>
   );
 }
+
