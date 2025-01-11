@@ -14,6 +14,7 @@ declare global {
 }
 
 export default function Cart() {
+  const user = JSON.parse(localStorage.getItem("user"));
   const router = useRouter();
   const { cart, increment, decrement, removeFromCart, clearCart } = useCart();
 
@@ -49,7 +50,7 @@ export default function Cart() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          customer_id: "user123",
+          customer_id: user._id,
           products,
           amount: calculateTotal()
         }),
@@ -82,7 +83,7 @@ export default function Cart() {
 
             const result = await verificationResponse.json();
 
-            if (result.success) {
+            if (result.ok) {
               toast.success("Payment successful!");
               clearCart();
               router.push("/order-success"); // Create this page to show success message
@@ -136,12 +137,10 @@ export default function Cart() {
                 className="flex items-center justify-between border-b pb-4"
               >
                 <div className="flex items-center space-x-4">
-                  <Image
+                  <img
                     src={product.product_image || "/placeholder-image.png"}
                     alt={product.name}
-                    width={80}
-                    height={80}
-                    className="object-cover rounded"
+                    className="h-20 w-20 object-cover rounded-lg"
                   />
                   <div>
                     <h3 className="text-lg font-semibold text-gray-800">

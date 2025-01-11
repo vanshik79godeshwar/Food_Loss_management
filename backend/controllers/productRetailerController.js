@@ -1,47 +1,42 @@
-// Function for creating products for retailer.
 const Products = require("../models/Product.js");
 
 const fetchProduct = async (req, res, next) => {
-  const userId = req.params.userId;
-  if (!userId) throw new Error("User Not found!");
+  const {id} = req.params;
+  if (!id) throw new Error("User Not found!");
 
-  const products = await Products.find({ retailer_id: userId });
-
+  const products = await Products.find({ retailer_id: id });
   return res.status(200).json(products);
 };
 
 // Function for getting products for particular retailer.
 const createProducts = async (req, res, next) => {
-  const userId = req.params.userId;
-  if (!userId) throw new Error("User Not found!");
+  const {id} = req.params;
+  if (!id) throw new Error("User Not found!");
 
-  const { name, price, expiry_date, discount, retailer_id, category,product_image,description } =
+  const { name, price, expiry_date, discount, category,quantity, product_image, description } =
     req.body;
-
-  if (
-    !name ||
-    !price ||
-    !expiry_date ||
-    !discount ||
-    !retailer_id ||
-    !category ||
-    !description ||
-    !product_image
-  )
-    throw new Error("Data not found!");
-
   const product = new Products({
     name,
     price,
     expiry_date,
     discount,
-    retailer_id,
+    retailer_id: id,
     category,
     product_image,
-    description
+    description,
+    quantity
   });
   await product.save();
   return res.status(200).json(product);
 };
 
-module.exports = { fetchProduct, createProducts };
+async function fetchProductDetails(req, res, next) {
+  const productId = req.params.productId;
+  if (!productId) throw new Error("Product not found!");
+  const product = await Products.findById(productId);
+  console.log(product); 
+  return res.status(200).json(product);
+}
+
+
+module.exports = { fetchProduct, createProducts,fetchProductDetails };

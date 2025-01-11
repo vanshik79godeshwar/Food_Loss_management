@@ -4,12 +4,11 @@ const productCustomerRoutes=require('./routes/productCustomerRoutes.js')
 const productRetailerRoutes=require("./routes/productRetailerRoutes.js");
 const billRoutes=require('./routes/billRoutes.js')
 const chartRoutes=require('./routes/chartRoutes.js')
-
+const cors=require('cors');
 require('dotenv').config()
 const app=express();
 const port=5000;
 const connect_db=require('./connect_db.js')
-const cors = require('cors')
 
 
 app.use(cors());

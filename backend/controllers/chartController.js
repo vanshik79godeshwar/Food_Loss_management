@@ -14,32 +14,32 @@ const getPriceDistribution = async (req, res) => {
       range,
       count
     }));
-
-    res.json(priceDistributionData);
+    console.log(priceDistribution);
+    res.json(priceDistributionData.sort());
   } catch (error) {
     res.status(500).json({ message: 'Error fetching price distribution data', error });
   }
 };
 
 const getRetailerDistribution = async (req, res) => {
-    try {
-      const products = await Product.find({});
-      
-      const retailerData = products.reduce((acc, item) => {
-        acc[item.retailer_id] = (acc[item.retailer_id] || 0) + 1;
-        return acc;
-      }, {});
-  
-      const retailerPieData = Object.entries(retailerData).map(([name, value]) => ({
-        name,
-        value
-      }));
-      
-      return res.json(retailerPieData);
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching retailer distribution data', error });
-    }
-  };
+  try {
+    const products = await Product.find({}).populate('retailer_id');
+    
+    const retailerData = products.reduce((acc, item) => {
+      acc[item.category] = (acc[item.category] || 0) + 1;
+      return acc;
+    }, {});
+
+    const retailerPieData = Object.entries(retailerData).map(([name, value]) => ({
+      name,
+      value
+    }));
+    
+    return res.json(retailerPieData);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching retailer distribution data', error });
+  }
+};
 
   const getDiscountData = async (req, res) => {
     try {
